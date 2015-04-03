@@ -4,11 +4,11 @@ from gtfs.models import *
 class StopInline(admin.StackedInline):
     model = Stop
     extra = 0
-    
+
 class RouteInline(admin.StackedInline):
     model = Route
     extra = 0
-    
+
 class AgencyInline(admin.StackedInline):
     model = Agency
     extra = 1
@@ -16,7 +16,7 @@ class AgencyInline(admin.StackedInline):
 class DataSetAdmin(admin.ModelAdmin):
     inlines = [AgencyInline,]
     list_display = ['name', 'note', ]
-    
+
 class TimezoneAdmin(admin.ModelAdmin):
     pass
 
@@ -30,9 +30,12 @@ class StopAdmin(admin.ModelAdmin):
     list_display = ['name','lat','lon']
 
 class RouteAdmin(admin.ModelAdmin):
-    list_filter = ['agency',]
     list_display = ['route_short_name','route_long_name', 'route_desc']
+    list_filter = ['agency',]
 
+class TripAdmin(admin.ModelAdmin):
+    list_display = ['route','trip_id','short_name','headsign','direction',]
+    list_filter = ['route__agency',]
 
 admin.site.register(DataSet, DataSetAdmin)
 
@@ -42,3 +45,4 @@ admin.site.register(Agency, AgencyAdmin)
 
 admin.site.register(Stop, StopAdmin)
 admin.site.register(Route, RouteAdmin)
+admin.site.register(Trip, TripAdmin)

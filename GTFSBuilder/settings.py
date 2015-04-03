@@ -101,9 +101,10 @@ GRAPPELLI_ADMIN_TITLE = 'GTFS Builder'
 GRAPPELLI_AUTOCOMPLETE_LIMIT = 15
 GRAPPELLI_SWITCH_USER = True
 
-FIXTURE_DIRS = (
-   os.path.join(BASE_DIR, 'gtfs', 'fixtures')
-)
+# FIXTURE_DIRS = (
+#    os.path.join(BASE_DIR, 'gtfs', 'fixtures')
+# )
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 

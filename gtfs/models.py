@@ -24,7 +24,7 @@ class DataSet(models.Model):
         ordering = ['name',]
     def __unicode__(self):
         return self.name
-        
+
 class Timezone(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -48,7 +48,6 @@ class Timezone(models.Model):
         ordering = ['name',]
     def __unicode__(self):
         return ''.join([self.name,' (UTC',self.utc_offset,')'])
-
 
 class Language(models.Model):
     id = models.UUIDField(
@@ -75,11 +74,11 @@ class Language(models.Model):
         ordering = ['iso_639_1',]
     def __unicode__(self):
         return u': '.join([self.iso_639_1, self.name,])
-        
+
 class Agency(models.Model): # For agency.txt (REQUIRED)
     id = models.UUIDField(
-        primary_key=True, 
-        default=uuid.uuid4, 
+        primary_key=True,
+        default=uuid.uuid4,
         editable=False)
     agency_id = models.CharField(
         max_length = 64,
@@ -133,6 +132,60 @@ class Agency(models.Model): # For agency.txt (REQUIRED)
         ordering = ['agency_id',]
     def __unicode__(self):
         return self.agency_name
+
+
+class Route(models.Model): # For routes.txt (REQUIRED)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    route_id = models.CharField(
+        max_length = 100
+    )
+    agency = models.ForeignKey(Agency)
+    route_short_name = models.CharField(
+        max_length = 100,
+    )
+    route_long_name = models.CharField(
+        max_length = 200,
+    )
+    route_desc = models.CharField(
+        max_length = 255,
+        blank = True,
+        default = u'',
+    )
+    ROUTE_TYPE_CHOICES = (
+        ('0', 'Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.'),
+        ('1', 'Subway, Metro. Any underground rail system within a metropolitan area.'),
+        ('2', 'Rail. Used for intercity or long-distance travel.'),
+        ('3', 'Bus. Used for short- and long-distance bus routes.'),
+        ('4', 'Ferry. Used for short- and long-distance boat service.'),
+        ('5', 'Cable car. Used for street-level cable cars where the cable runs beneath the car.'),
+        ('6', 'Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.'),
+        ('7', 'Funicular. Any rail system designed for steep inclines.'),
+    )
+    route_type = models.CharField(
+        max_length = 1,
+        choices = ROUTE_TYPE_CHOICES,
+        default = u'0'
+    )
+    route_url = models.URLField(
+        blank = True,
+        default = u'',
+    )
+    route_color = models.CharField(
+        max_length = 6,
+        blank = True,
+        default = u'',
+    )
+    route_text_color = models.CharField(
+        max_length = 6,
+        blank = True,
+        default = u'',
+    )
+    class Meta:
+        verbose_name = u'Route'
+        verbose_name_plural = u'Routes'
+        ordering = ['agency__agency_name','route_short_name',]
+    def __unicode__(self):
+        return " - ".join([self.route_short_name, self.route_long_name])
 
 class Stop(models.Model): # For stops.txt (REQUIRED)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -217,75 +270,6 @@ class Stop(models.Model): # For stops.txt (REQUIRED)
         return self.name
 
 
-class Route(models.Model): # For routes.txt (REQUIRED)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    route_id = models.CharField(
-        max_length = 100
-    )
-    agency = models.ForeignKey(Agency)
-    route_short_name = models.CharField(
-        max_length = 100,
-    )
-    route_long_name = models.CharField(
-        max_length = 200,
-    )
-    route_desc = models.CharField(
-        max_length = 255,
-        blank = True,
-        default = u'',
-    )
-    ROUTE_TYPE_CHOICES = (
-        ('0', 'Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.'),
-        ('1', 'Subway, Metro. Any underground rail system within a metropolitan area.'),
-        ('2', 'Rail. Used for intercity or long-distance travel.'),
-        ('3', 'Bus. Used for short- and long-distance bus routes.'),
-        ('4', 'Ferry. Used for short- and long-distance boat service.'),
-        ('5', 'Cable car. Used for street-level cable cars where the cable runs beneath the car.'),
-        ('6', 'Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.'),
-        ('7', 'Funicular. Any rail system designed for steep inclines.'),
-    )
-    route_type = models.CharField(
-        max_length = 1,
-        choices = ROUTE_TYPE_CHOICES,
-        default = u'0'
-    )
-    route_url = models.URLField(
-        blank = True,
-        default = u'',
-    )
-    route_color = models.CharField(
-        max_length = 6,
-        blank = True,
-        default = u'',
-    )
-    route_text_color = models.CharField(
-        max_length = 6,
-        blank = True,
-        default = u'',
-    )
-    class Meta:
-        verbose_name = u'Route'
-        verbose_name_plural = u'Routes'
-        ordering = ['agency__agency_name','route_short_name',]
-    def __unicode__(self):
-        return " - ".join([self.route_short_name, self.route_long_name])
-#
-# class Trip(models.Model): # For trips.txt (REQUIRED)
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     class Meta:
-#         verbose_name = u'Trip'
-#         verbose_name_plural = u'Trips'
-#         ordering = ['',]
-#
-#
-# class StopTime(models.Model): # For stop_times.txt (REQUIRED)
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     class Meta:
-#         verbose_name = u'Stop Time'
-#         verbose_name_plural = u'Stop Times'
-#         ordering = ['',]
-#
-#
 # class Calendar(models.Model): # For calendar.txt (REQUIRED)
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 #     class Meta:
@@ -300,6 +284,107 @@ class Route(models.Model): # For routes.txt (REQUIRED)
 #         verbose_name = u'Calendar Date'
 #         verbose_name_plural = u'Calendar Dates'
 #         ordering = ['',]
+
+# class Shape(models.Model): # shapes.txt (OPTIONAL)
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     class Meta:
+#         verbose_name = u'Shape'
+#         verbose_name_plural = u'Shapes'
+#         ordering = ['',]
+
+
+class Trip(models.Model): # For trips.txt (REQUIRED)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    route = models.ForeignKey(Route)
+    # TODO Make so either service_calendar OR service_calendardate is set.
+    # service_calendar = models.ForeignKey(
+    #     Calendar,
+    #     null = True,
+    #     verbose_name = u'Service by Calendar',
+    # )
+    # service_calendardate = models.ForeignKey(
+    #     CalendarDate,
+    #     null = True,
+    #     verbose_name = u'Service by Calendar Date',
+    # )
+    trip_id = models.CharField(
+        max_length = 128,
+        verbose_name = u'Trip ID',
+        help_text = u'The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.',
+    )
+    headsign = models.CharField(
+        max_length = 128,
+        blank = True,
+        default = u'',
+        verbose_name = u'Headsign',
+        help_text = u'The trip_headsign field contains the text that appears on a sign that identifies the trip\'s destination to passengers. Use this field to distinguish between different patterns of service in the same route. If the headsign changes during a trip, you can override the trip_headsign by specifying values for the the stop_headsign field in stop_times.txt.',
+    )
+    short_name = models.CharField(
+        max_length = 128,
+        blank = True,
+        default = u'',
+        verbose_name = u'Short Name',
+        help_text = u'The trip_short_name field contains the text that appears in schedules and sign boards to identify the trip to passengers, for example, to identify train numbers for commuter rail trips. If riders do not commonly rely on trip names, please leave this field blank. A trip_short_name value, if provided, should uniquely identify a trip within a service day; it should not be used for destination names or limited/express designations.',
+    )
+    DIRECTION_CHOICES = (
+        ('0','Primary/Outbound Direction'),
+        ('1','Secondary/Inbound Direction'),
+    )
+    direction = models.CharField(
+        max_length = 1,
+        choices = DIRECTION_CHOICES,
+        default = u'0',
+        verbose_name = 'Direction',
+    )
+    block_id = models.CharField(
+        max_length = 128,
+        blank = True,
+        default = u'',
+        verbose_name = u'Block ID',
+        help_text = u'The block_id field identifies the block to which the trip belongs. A block consists of two or more sequential trips made using the same vehicle, where a passenger can transfer from one trip to the next just by staying in the vehicle. The block_id must be referenced by two or more trips in trips.txt.',
+    )
+    # shape = models.ForeignKey(
+    #     Shape,
+    #     null = True,
+    # )
+    WHEELCHAIR_CHOICES = (
+        ('0', 'No Accessibility Info'),
+        ('1', 'Vehicle Can Accommodate at Least One Wheelchair'),
+        ('2', 'No Wheelchairs Can be Accommodated'),
+    )
+    wheelchair_accessible = models.CharField(
+        max_length = 1,
+        choices = WHEELCHAIR_CHOICES,
+        default = u'0',
+        verbose_name = u'Wheelchair Accessibility'
+    )
+    BIKE_CHOICES = (
+        ('0', 'No Bike Info Available'),
+        ('1', 'Bicycles Are Allowed'),
+        ('2', 'Bicycles Are Not Allowed'),
+    )
+    bike_access = models.CharField(
+        max_length = 1,
+        choices = BIKE_CHOICES,
+        default = u'0',
+        verbose_name = u'Bicycle Allowance'
+    )
+    class Meta:
+        verbose_name = u'Trip'
+        verbose_name_plural = u'Trips'
+        ordering = ['trip_id',]
+    def __unicode__(self):
+        return self.trip_id
+
+
+# class StopTime(models.Model): # For stop_times.txt (REQUIRED)
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     class Meta:
+#         verbose_name = u'Stop Time'
+#         verbose_name_plural = u'Stop Times'
+#         ordering = ['',]
+#
+#
 #
 #
 # class FareAttribute(models.Model): # For fare_attributes.txt (OPTIONAL)
@@ -318,12 +403,6 @@ class Route(models.Model): # For routes.txt (REQUIRED)
 #         ordering = ['',]
 #
 #
-# class Shape(models.Model): # shapes.txt (OPTIONAL)
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     class Meta:
-#         verbose_name = u'Shape'
-#         verbose_name_plural = u'Shapes'
-#         ordering = ['',]
 #
 #
 # class Frequency(models.Model): # For frequencies (OPTIONAL)
